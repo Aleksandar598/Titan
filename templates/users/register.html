@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Titan - Registration</title>
+</head>
+<body>
+    <h2>Create a profile in Titan </h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
+    <p>Already registered? <a href="{% url 'login' %}"> Login here!</a>.</p>
+</body>
+</html>x
