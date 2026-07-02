@@ -8,7 +8,7 @@ class CustomUser(AbstractUser):
         ('maintain', 'Keep Weight'),
         ('gain', 'Gain Weight'),
     ]
-
+    email = models.EmailField(unique=True, blank=False, verbose_name="Email Address")
     birth_date = models.DateField(verbose_name="Birth Date")
     height = models.FloatField(verbose_name="Height(cm)")
     current_weight = models.FloatField(verbose_name="Current Weight(kg)")
@@ -19,6 +19,6 @@ class CustomUser(AbstractUser):
         default='maintain',
         verbose_name="Fitness Goal",
     )
-
+    REQUIRED_FIELDS = ['email' , 'birth_date', 'height', 'current_weight', 'target_weight']
     def __str__(self):
         return self.username
