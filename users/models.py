@@ -22,3 +22,8 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['email' , 'birth_date', 'height', 'current_weight', 'target_weight']
     def __str__(self):
         return self.username
+
+class WeightHistory(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    weight = models.FloatField(verbose_name="Weight (kg)")
+    recorded_at = models.DateField(auto_now_add=True, verbose_name="Recorded at")

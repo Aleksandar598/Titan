@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Titan - Log Weight</title>
+    <style>
+        .errorlist {
+            color: #d9534f;
+            list-style-type: none;
+            padding: 0;
+            margin: 5px 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Welcome, {{ user.username }}!</h2>
+    <p>Your current weight is: <strong>{{ user.current_weight }} kg</strong> (Target: {{ user.target_weight }} kg)</p>
+
+    <h3>Log a New Weight</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Weight</button>
+    </form>
+
+    <h3>Your Weight History</h3>
+    {% if logs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.recorded_at|date:"Y-m-d" }}</td>
+                    <td>{{ log.weight }} kg</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No weight logs recorded yet. Start tracking above!</p>
+    {% endif %}
+
+    <p style="margin-top: 30px;"><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>

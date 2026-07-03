@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.utils import timezone
+from django.urls import reverse
 import datetime
-from users.models import CustomUser
-from users.forms import TitanUserCreationForm
+from users.models import CustomUser, WeightHistory
+from users.forms import TitanUserCreationForm, LogWeightForm
 
 
 class TitanUserCreationFormTest(TestCase):
@@ -99,3 +100,45 @@ class TitanUserCreationFormTest(TestCase):
         form = TitanUserCreationForm(data=data)
         self.assertFalse(form.is_valid())
         self.assertIn('fitness_goal', form.errors)
+
+class WeightHistoryTest(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="user", email="example@email.com",
+                                                   password="TheGreatPassword",
+                                                   birth_date=datetime.date(1990, 1, 1),
+                                                   height=120,
+                                                   current_weight=100,
+                                                   target_weight=120,
+                                                   fitness_goal="gain")
+        self.url = reverse('log_weight')
+
+    def test_form_valid(self):
+        form = LogWeightForm(data={'weight' : 50.2})
+        self.assertTrue(form.is_valid())
+
+    def test_form_low_weight(self):
+        form = LogWeightForm(data={'weight' : 10})
+        self.assertFalse(form.is_valid())
+
+    def test_form_high_weight(self):
+        form = LogWeightForm(data={'weight' : 12000})
+        self.assertFalse(form.is_valid())
+
+    def test_view_logout_view(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_successful_weight_log(self):
+        self.client.login(username=self.user.username, password="TheGreatPassword")
+        response = self.client.post(self.url, data={'weight' : 100.2} )
+        print("REDIRECT URL TO:", response.get('Location'))
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(WeightHistory.objects.filter(user=self.user).count(), 1)
+        latest_log = WeightHistory.objects.filter(user=self.user).first()
+        self.assertEqual(latest_log.weight, 100.2)
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.current_weight, 100.2)
+    
