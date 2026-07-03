@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from .views import home_view
-from users.views import register_view, log_weight_view
+from users.views import register_view, log_weight_view, dashboard_view, update_user_info
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,4 +27,6 @@ urlpatterns = [
     path('register/', register_view, name='register'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('log_weight/', log_weight_view, name='log_weight'),
+    path('dashboard/', dashboard_view, name='dashboard'),
+    path('update_user_info/', update_user_info, name='update_user_info'),
 ]

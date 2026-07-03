@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<div class="container">
+    <h2>Промени своите данни</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {# Извеждане на общи грешки на формата, ако има такива #}
+        {% if form.non_field_errors %}
+            <div class="non-field-errors">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {# Динамично обхождане и извеждане на всяко поле от UpdateUserForm #}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                {# Django автоматично ще рендерира правилния таг (input или select) с нашите стъпки #}
+                {{ field }}
+
+                {# Ако конкретното поле има грешка (напр. от validate_fitness_goal), тя ще се покаже тук #}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <div class="error-message">⚠️ {{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-success">Запази промените</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Отказ</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

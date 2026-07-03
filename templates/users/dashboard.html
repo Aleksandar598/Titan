@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Titan - Dashboard</title>
+</head>
+<body>
+
+<div class="container">
+    <h2>Welcome, {{ user.username }}!</h2>
+
+    <div class="button-stack">
+        <a href="{% url 'log_weight' %}" class="btn btn-primary">Log Weight</a>
+        <br>
+        <a href = "{% url 'update_user_info' %}" class="btn btn-primary">Update Your Info</a>
+        <br>
+        <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -4,10 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from .models import CustomUser, WeightHistory
-
-MINIMUM_WEIGHT = 20
-MAXIMUM_WEIGHT = 500
-MINIMUM_HEIGHT = 80
+from .validators import validate_maximum_weight, validate_minimum_weight, validate_birth_date, validate_fitness_goal, validate_realistic_height, MINIMUM_WEIGHT, MAXIMUM_WEIGHT
 
 class TitanUserCreationForm(UserCreationForm):
     birth_date = forms.DateField(
@@ -27,44 +24,31 @@ class TitanUserCreationForm(UserCreationForm):
 
     def clean_birth_date(self):
         birth_date = self.cleaned_data.get('birth_date')
-        if birth_date and birth_date > timezone.now().date():
-            raise ValidationError("Birth Date cannot be in the future")
+        validate_birth_date(birth_date)
         return birth_date
 
     def clean_height(self):
         height = self.cleaned_data.get('height')
-        if height < MINIMUM_HEIGHT:
-            raise ValidationError("Height cannot be less than 80")
+        validate_realistic_height(height)
         return height
 
     def clean_current_weight(self):
         weight = self.cleaned_data.get('current_weight')
-        if weight < MINIMUM_WEIGHT or weight > MAXIMUM_WEIGHT:
-            raise ValidationError("Weight must be realistic")
+        validate_minimum_weight(weight)
+        validate_maximum_weight(weight)
         return weight
 
     def clean_target_weight(self):
         target_weight = self.cleaned_data.get('target_weight')
-        if target_weight < MINIMUM_WEIGHT or target_weight > MAXIMUM_WEIGHT:
-            raise ValidationError("Target weight must be realistic.")
+        validate_minimum_weight(target_weight)
+        validate_maximum_weight(target_weight)
         return target_weight
 
     def clean_fitness_goal(self):
         fitness_goal = self.cleaned_data.get('fitness_goal')
         cur_weight = self.cleaned_data.get('current_weight')
         target_weight = self.cleaned_data.get('target_weight')
-        if cur_weight is None or target_weight is None:
-            return fitness_goal
-
-        if fitness_goal == "maintain":
-            if cur_weight != target_weight:
-                raise ValidationError("Fitness goal must be equal to target weight")
-        if fitness_goal == "gain":
-            if cur_weight >= target_weight:
-                raise ValidationError("Fitness goal must be less than target weight")
-        if fitness_goal == "lose":
-            if cur_weight <= target_weight:
-                raise ValidationError("Fitness goal must be less than target weight")
+        validate_fitness_goal(fitness_goal, cur_weight, target_weight)
         return fitness_goal
 
 class LogWeightForm(forms.ModelForm):
@@ -77,6 +61,46 @@ class LogWeightForm(forms.ModelForm):
 
     def clean_weight(self):
         weight = self.cleaned_data.get('weight')
-        if weight < MINIMUM_WEIGHT or weight > MAXIMUM_WEIGHT:
-             raise ValidationError("Weight must be realistic")
+        validate_minimum_weight(weight)
+        validate_maximum_weight(weight)
         return weight
+
+
+class UpdateUserForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['birth_date', 'height', 'target_weight', 'fitness_goal']
+        widgets = {
+            'birth_date': forms.DateInput(attrs={'type': 'date'}),
+            'height': forms.NumberInput(attrs={'step': '0.1'}),
+            'target_weight': forms.NumberInput(attrs={'step': '0.1'}),
+            'fitness_goal': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data.get('birth_date')
+        validate_birth_date(birth_date)
+        return birth_date
+
+    def clean_height(self):
+        height = self.cleaned_data.get('height')
+        validate_realistic_height(height)
+        return height
+
+    def clean_target_weight(self):
+        weight = self.cleaned_data.get('target_weight')
+        validate_minimum_weight(weight)
+        return weight
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fitness_goal = cleaned_data.get('fitness_goal')
+        target_weight = cleaned_data.get('target_weight')
+        current_weight = self.instance.current_weight
+        if fitness_goal and target_weight is not None:
+            try:
+                validate_fitness_goal(fitness_goal, current_weight, target_weight)
+            except ValidationError as e:
+                self.add_error('fitness_goal', e)
+
+        return cleaned_data

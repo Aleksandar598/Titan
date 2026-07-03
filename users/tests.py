@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.urls import reverse
 import datetime
 from users.models import CustomUser, WeightHistory
-from users.forms import TitanUserCreationForm, LogWeightForm
+from users.forms import TitanUserCreationForm, LogWeightForm, UpdateUserForm
 
 
 class TitanUserCreationFormTest(TestCase):
@@ -141,4 +141,65 @@ class WeightHistoryTest(TestCase):
 
         self.user.refresh_from_db()
         self.assertEqual(self.user.current_weight, 100.2)
-    
+
+class UserUpdateTest(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username="user", email="example@email.com",
+                                                   password="TheGreatPassword",
+                                                   birth_date=datetime.date(1990, 1, 1),
+                                                   height=120,
+                                                   current_weight=100,
+                                                   target_weight=120,
+                                                   fitness_goal="gain")
+        self.url = reverse('update_user_info')
+    def test_form_valid(self):
+        form_data = {
+            'birth_date': '1993-02-02',
+            'height': '180',
+            'target_weight': '200',
+            'fitness_goal': 'gain'
+        }
+        form = UpdateUserForm(data=form_data, instance=self.user)
+        self.assertTrue(form.is_valid())
+
+    def test_form_invalid_fitness_goal(self):
+        form_data = {
+            'birth_date': '1993-02-02',
+            'height': '180',
+            'target_weight': '200',
+            'fitness_goal': 'lose'
+        }
+        form = UpdateUserForm(data=form_data, instance=self.user)
+        self.assertFalse(form.is_valid())
+
+    def test_form_invalid_height(self):
+        form_data = {
+            'birth_date': '1993-02-02',
+            'height': '2',
+            'target_weight': '200',
+            'fitness_goal': 'lose'
+        }
+        form = UpdateUserForm(data=form_data, instance=self.user)
+        self.assertFalse(form.is_valid())
+
+    def test_view_logout_redirect(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
+
+    def test_database_update_on_success(self):
+        self.client.login(username="user", password="TheGreatPassword")
+        form_data = {
+            'birth_date': '1990-01-01',
+            'height': '150',
+            'target_weight': '80',
+            'fitness_goal': 'lose'
+        }
+        response = self.client.post(self.url, data=form_data)
+        self.assertEqual(response.status_code, 302)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.target_weight, 80)
+        self.assertEqual(self.user.fitness_goal, 'lose')
+        self.assertEqual(self.user.birth_date, datetime.date(1990, 1, 1))
+        self.assertEqual(self.user.height, 150)

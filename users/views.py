@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from .forms import TitanUserCreationForm, LogWeightForm
+from .forms import TitanUserCreationForm, LogWeightForm, UpdateUserForm
 from .models import WeightHistory
 
 
@@ -35,3 +35,19 @@ def log_weight_view(request):
 
     logs = WeightHistory.objects.filter(user=request.user)
     return render(request, 'users/log_weight.html', {'form': form, 'logs': logs})
+
+@login_required
+def dashboard_view(request):
+    return render(request, 'users/dashboard.html')
+
+@login_required
+def update_user_info(request):
+    if request.method == 'POST':
+        form = UpdateUserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('update_user_info')
+    else:
+        form = UpdateUserForm(instance=request.user)
+    return render(request, 'users/update_user_info.html', {'form': form})
+
