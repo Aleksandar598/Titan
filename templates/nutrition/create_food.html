@@ -1,0 +1,36 @@
+!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add custom food</title>
+</head>
+<body>
+
+    <h2>Create food</h2>
+    <div>Enter the amount for 100 grams</div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <div style="color: red;">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div>
+            <button type="submit">Създай храна</button>
+            <a href="{% url 'dashboard' %}">Отказ</a>
+        </div>
+    </form>
+
+</body>
+</html>

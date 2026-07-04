@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    <h2>Add Food to Diary</h2>
+
+    <form method="GET" action="">
+        <input type="text" name="query" value="{{ query }}" placeholder="Търси храна..." required>
+        <button type="submit">Търси</button>
+    </form>
+
+    <br><br>
+
+    {% if query %}
+        <h3>Results: "{{ query }}"</h3>
+
+        <h4>Saved foods</h4>
+        {% if db_result %}
+            <ul>
+                {% for food in db_result %}
+                    <li>
+                        <strong>{{ food.name }}</strong> -
+                        {{ food.calories }} kcal | П: {{ food.proteins }}g | В: {{ food.carbs }}g | М: {{ food.fats }}g
+
+                        <form method="POST" action="" style="display:inline; margin-left: 15px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="api_id" value="{{ food.api_food_id }}">
+                            <input type="hidden" name="food_name" value="{{ food.name }}">
+                            <input type="hidden" name="calories" value="{{ food.calories }}">
+                            <input type="hidden" name="proteins" value="{{ food.proteins }}">
+                            <input type="hidden" name="carbs" value="{{ food.carbs }}">
+                            <input type="hidden" name="fats" value="{{ food.fats }}">
+
+                            <input type="number" name="weight_grams" value="100" min="1" style="width: 60px;" required> grans
+                            <button type="submit">Add</button>
+                        </form>
+                        <br><br>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have no custom foods associated with the search.</p>
+        {% endif %}
+
+        <hr>
+
+        <h4>Results:</h4>
+        {% if results %}
+            <ul>
+                {% for food in results %}
+                    <li>
+                        <strong>{{ food.name }}</strong> -
+                        {{ food.calories }} kcal | Proteins: {{ food.proteins }}g | Carbs: {{ food.carbs }}g | Fats: {{ food.fats }}g
+
+                        <form method="POST" action="" style="display:inline; margin-left: 15px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="api_id" value="{{ food.api_id }}">
+                            <input type="hidden" name="food_name" value="{{ food.name }}">
+                            <input type="hidden" name="calories" value="{{ food.calories }}">
+                            <input type="hidden" name="proteins" value="{{ food.proteins }}">
+                            <input type="hidden" name="carbs" value="{{ food.carbs }}">
+                            <input type="hidden" name="fats" value="{{ food.fats }}">
+
+                            <input type="number" name="weight_grams" value="100" min="1" style="width: 60px;" required> grams
+                            <button type="submit">Add</button>
+                        </form>
+                        <br><br>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No results found</p>
+        {% endif %}
+
+    {% endif %}
+
+</body>
+</html>
