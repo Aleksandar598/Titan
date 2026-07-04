@@ -1,0 +1,62 @@
+[
+  {
+    "model": "exercise.exercise",
+    "pk": 1,
+    "fields": {
+      "name": "Barbell Bench Press",
+      "description": "A classic compound movement using free weights to build strength and mass in the chest, shoulders, and triceps.",
+      "muscle_group": "Chest",
+      "type_of_exercise": 6.0
+    }
+  },
+  {
+    "model": "exercise.exercise",
+    "pk": 2,
+    "fields": {
+      "name": "Barbell Back Squat",
+      "description": "The king of lower-body exercises. Targets the quadriceps, hamstrings, glutes, and lower back.",
+      "muscle_group": "Legs",
+      "type_of_exercise": 6.0
+    }
+  },
+  {
+    "model": "exercise.exercise",
+    "pk": 3,
+    "fields": {
+      "name": "Pull-Ups",
+      "description": "An essential calisthenics exercise performed with bodyweight to build a strong back and biceps.",
+      "muscle_group": "Back",
+      "type_of_exercise": 4.0
+    }
+  },
+  {
+    "model": "exercise.exercise",
+    "pk": 4,
+    "fields": {
+      "name": "Push-Ups",
+      "description": "A fundamental bodyweight movement that builds upper body endurance and core stability.",
+      "muscle_group": "Chest",
+      "type_of_exercise": 4.0
+    }
+  },
+  {
+    "model": "exercise.exercise",
+    "pk": 5,
+    "fields": {
+      "name": "Seated Cable Row",
+      "description": "A controlled movement performed on a machine to target the upper back and lats while minimizing lower back stress.",
+      "muscle_group": "Back",
+      "type_of_exercise": 3.5
+    }
+  },
+  {
+    "model": "exercise.exercise",
+    "pk": 6,
+    "fields": {
+      "name": "Kettlebell Swing",
+      "description": "A powerful functional and CrossFit exercise that conditions the entire posterior chain and improves explosive power.",
+      "muscle_group": "Full Body",
+      "type_of_exercise": 8.0
+    }
+  }
+]

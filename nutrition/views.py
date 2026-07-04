@@ -64,3 +64,5 @@ def log_food_view(request):
         'query': query
     }
     return render(request, 'nutrition/log_food.html', context)
+
+
